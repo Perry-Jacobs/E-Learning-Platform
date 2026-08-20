@@ -40,7 +40,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       `
     );
 
-    // ✅ FIX: Double cast through unknown
     const user = result.rows[0] as unknown as User;
     const tokens = generateTokens(user);
 
@@ -63,7 +62,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    // Get user with password
     const result = await db.execute(
       sql`
         SELECT id, email, name, role, password 
@@ -77,17 +75,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // ✅ FIX: Double cast through unknown
     const user = result.rows[0] as unknown as User & { password: string };
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       res.status(401).json({ success: false, message: 'Invalid credentials' });
       return;
     }
 
-    // Remove password from response
     delete (user as any).password;
 
     const tokens = generateTokens(user);
@@ -127,7 +122,6 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // ✅ FIX: Double cast through unknown
     const user = result.rows[0] as unknown as User;
 
     res.status(200).json({
@@ -144,7 +138,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 // ============================================
 export const refreshToken = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken: _refreshToken } = req.body; // ✅ Underscore = intentionally unused
     // TODO: Verify refresh token and generate new tokens
     res.status(200).json({ success: true, message: 'Token refreshed' });
   } catch (error) {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { sql, SQL } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';  // ✅ Use 'type' keyword
 import { db } from '../config/database.config';
 
 // Define Discussion interface for type safety

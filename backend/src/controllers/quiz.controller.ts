@@ -14,15 +14,7 @@ type Quiz = {
   updated_at?: Date;
 };
 
-type QuizQuestion = {
-  id: string;
-  quiz_id: string;
-  question_text: string;
-  options: string[];
-  correct_answer: string;
-  points: number;
-  order_index: number;
-};
+// Removed unused QuizQuestion type
 
 type QuizAttempt = {
   id: string;
