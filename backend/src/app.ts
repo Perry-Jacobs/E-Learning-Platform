@@ -19,6 +19,9 @@ app.get('/', (_: Request, res: Response) => {  // 👈 Note the types
   });
 });
 
+import routes from './routes';  // ✅ Now includes all 7 route modules
+app.use('/api', routes);
+
 // Error handling middleware
 app.use((err: any, _: Request, res: Response, __: any) => {
   console.error(err.stack);
