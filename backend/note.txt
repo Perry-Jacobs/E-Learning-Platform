@@ -1,0 +1,24 @@
+🌱 Starting database seeding...
+✅ Connected to PostgreSQL database
+🧹 Cleared existing data
+✅ Created users:
+   - Dr. John Smith (lecturer)
+   - Alice Johnson (student)
+   - Bob Williams (student)
+✅ Created course: "Complete Web Development Bootcamp 2024"
+✅ Created 3 chapters for the course
+✅ Created quiz: "HTML & CSS Fundamentals Quiz" with 5 questions
+✅ Created assignment: "Build Your Personal Portfolio"
+
+🎉 Database seeding completed successfully!
+📊 Summary:
+   - 3 users (1 lecturer, 2 students)
+   - 1 course
+   - 3 chapters
+   - 1 quiz with 5 questions
+   - 1 assignment
+
+💡 Test Credentials:
+   Lecturer: john.smith@university.com / password123
+   Student: alice.johnson@student.com / password123
+   Student: bob.williams@student.com / password123

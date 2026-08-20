@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemond --exec tsx src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "ts-node src/db/migrate.ts",
-    "db:push": "drizzle-kit push:pg",
-    "db:studio": "drizzle-kit studio",
-    "db:seed": "ts-node src/db/seed/seed.ts",
+    "db:generate": "drizzle-kit generate --config=./src/drizzle.config.ts",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:push": "drizzle-kit push --config=./src/drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config=./src/drizzle.config.ts",
+    "db:drop": "drizzle-kit drop",
+    "db:seed": "tsx src/db/seed/seed.ts",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],
@@ -45,8 +46,10 @@
     "@types/multer": "^2.2.0",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.10",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
+    "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   }
 }
