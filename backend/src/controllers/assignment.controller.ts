@@ -2,9 +2,6 @@ import { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
-// ============================================
-// Get all assignments
-// ============================================
 export const getAllAssignments = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.query;
@@ -24,9 +21,6 @@ export const getAllAssignments = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// ============================================
-// Get assignment by ID
-// ============================================
 export const getAssignmentById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -52,9 +46,6 @@ export const getAssignmentById = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// ============================================
-// Create assignment
-// ============================================
 export const createAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, course_id, due_date, max_score } = req.body;
@@ -98,9 +89,6 @@ export const createAssignment = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ============================================
-// Update assignment
-// ============================================
 export const updateAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -148,9 +136,6 @@ export const updateAssignment = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ============================================
-// Delete assignment
-// ============================================
 export const deleteAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -187,9 +172,6 @@ export const deleteAssignment = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ============================================
-// Submit assignment
-// ============================================
 export const submitAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { assignment_id, submission_text, file_url } = req.body;
@@ -209,7 +191,6 @@ export const submitAssignment = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Check if already submitted
     const existing = await db.execute(
       sql`SELECT id FROM submissions WHERE assignment_id = ${assignment_id} AND student_id = ${student_id}`
     );

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
-// Define types (use type, not interface, for easier casting)
 type Quiz = {
   id: string;
   title: string;
@@ -14,8 +13,6 @@ type Quiz = {
   updated_at?: Date;
 };
 
-// Removed unused QuizQuestion type
-
 type QuizAttempt = {
   id: string;
   quiz_id: string;
@@ -25,7 +22,6 @@ type QuizAttempt = {
   attempted_at?: Date;
 };
 
-// Helper function to safely cast unknown to Quiz
 function asQuiz(row: unknown): Quiz {
   return row as Quiz;
 }
@@ -34,9 +30,6 @@ function asQuizAttempt(row: unknown): QuizAttempt {
   return row as QuizAttempt;
 }
 
-// ============================================
-// Get all quizzes (filtered by course if provided)
-// ============================================
 export const getAllQuizzes = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.query;
@@ -57,9 +50,6 @@ export const getAllQuizzes = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// ============================================
-// Get quiz by ID (with questions)
-// ============================================
 export const getQuizById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -96,9 +86,6 @@ export const getQuizById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// ============================================
-// Create quiz (Instructor only)
-// ============================================
 export const createQuiz = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, course_id, time_limit, passing_score, questions } = req.body;
@@ -161,9 +148,6 @@ export const createQuiz = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// ============================================
-// Update quiz (Instructor only)
-// ============================================
 export const updateQuiz = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -237,9 +221,6 @@ export const updateQuiz = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// ============================================
-// Delete quiz (Instructor only)
-// ============================================
 export const deleteQuiz = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -283,9 +264,6 @@ export const deleteQuiz = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// ============================================
-// Submit quiz attempt (Student only)
-// ============================================
 export const submitQuizAttempt = async (req: Request, res: Response): Promise<void> => {
   try {
     const { quiz_id, answers } = req.body;
@@ -371,9 +349,6 @@ export const submitQuizAttempt = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// ============================================
-// Get quiz results for a student
-// ============================================
 export const getQuizResults = async (req: Request, res: Response): Promise<void> => {
   try {
     const { quizId } = req.params;

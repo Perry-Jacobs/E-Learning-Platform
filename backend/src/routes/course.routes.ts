@@ -1,23 +1,27 @@
 import { Router } from 'express';
 import {
-  getAllContents,
-  getContentById,
-  createContent,
-  updateContent,
-  deleteContent,
+  getAllCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  enrollCourse,
+  getMyCourses,
 } from '../controllers';
-import { authenticate, authorize } from '../middleware/auth.middleware'; // ✅ Import
+import { authenticate, authorize } from '../middleware';
 
 const router = Router();
 
-// Public read routes
-router.get('/', getAllContents);
-router.get('/:id', getContentById);
+router.get('/', getAllCourses);
+router.get('/:id', getCourseById);
 
-// Protected routes
-router.use(authenticate); // ✅ All routes below require login
-router.post('/', authorize('lecturer', 'admin'), createContent);
-router.put('/:id', authorize('lecturer', 'admin'), updateContent);
-router.delete('/:id', authorize('lecturer', 'admin'), deleteContent);
+router.use(authenticate);
+
+router.get('/me', getMyCourses);
+router.post('/:courseId/enroll', enrollCourse);
+
+router.post('/', authorize('lecturer', 'admin'), createCourse);
+router.put('/:id', authorize('lecturer', 'admin'), updateCourse);
+router.delete('/:id', authorize('lecturer', 'admin'), deleteCourse);
 
 export default router;

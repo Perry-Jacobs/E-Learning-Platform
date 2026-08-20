@@ -6,12 +6,16 @@ import {
   updateContent,
   deleteContent,
 } from '../controllers';
+import { authenticate, authorize } from '../middleware';
 
 const router = Router();
+
 router.get('/', getAllContents);
 router.get('/:id', getContentById);
-router.post('/', createContent);
-router.put('/:id', updateContent);
-router.delete('/:id', deleteContent);
+
+router.use(authenticate);
+router.post('/', authorize('lecturer', 'admin'), createContent);
+router.put('/:id', authorize('lecturer', 'admin'), updateContent);
+router.delete('/:id', authorize('lecturer', 'admin'), deleteContent);
 
 export default router;

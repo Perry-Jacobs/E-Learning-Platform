@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { sql, SQL } from 'drizzle-orm';  // ✅ Import both
+import { sql, SQL } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
-// Define Content interface for type safety
 interface Content {
   id: string;
   title: string;
@@ -16,15 +15,12 @@ interface Content {
   updated_at?: Date;
 }
 
-// ============================================
-// Get all contents (filtered by course if provided)
-// ============================================
 export const getAllContents = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId, chapterId } = req.query;
     
     let query = sql`SELECT * FROM contents`;
-    const conditions: SQL[] = [];  // ✅ Use SQL type
+    const conditions: SQL[] = [];
     
     if (courseId) {
       conditions.push(sql`course_id = ${courseId}`);
@@ -47,9 +43,6 @@ export const getAllContents = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// ============================================
-// Get content by ID
-// ============================================
 export const getContentById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -70,9 +63,6 @@ export const getContentById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// ============================================
-// Create content (Instructor only)
-// ============================================
 export const createContent = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, type, url, duration, course_id, chapter_id, order_index } = req.body;
@@ -83,7 +73,6 @@ export const createContent = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Verify instructor owns the course
     const courseCheck = await db.execute(
       sql`SELECT instructor_id FROM courses WHERE id = ${course_id}`
     );
@@ -98,7 +87,6 @@ export const createContent = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Insert content
     const result = await db.execute(
       sql`
         INSERT INTO contents (title, type, url, duration, course_id, chapter_id, order_index)
@@ -120,9 +108,6 @@ export const createContent = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// ============================================
-// Update content (Instructor only)
-// ============================================
 export const updateContent = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -134,7 +119,6 @@ export const updateContent = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Verify content exists and instructor owns the course
     const checkResult = await db.execute(
       sql`
         SELECT c.id, co.instructor_id 
@@ -178,9 +162,6 @@ export const updateContent = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// ============================================
-// Delete content (Instructor only)
-// ============================================
 export const deleteContent = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -191,7 +172,6 @@ export const deleteContent = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Verify content exists and instructor owns the course
     const checkResult = await db.execute(
       sql`
         SELECT c.id, co.instructor_id 

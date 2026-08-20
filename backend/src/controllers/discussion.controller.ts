@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { sql } from 'drizzle-orm';  // ✅ Use 'type' keyword
+import { sql } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
-// Define Discussion interface for type safety
 interface Discussion {
   id: string;
   title: string;
@@ -24,9 +23,6 @@ interface DiscussionReply {
   author_name?: string;
 }
 
-// ============================================
-// Get all discussions for a course (with author info)
-// ============================================
 export const getDiscussionsByCourse = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.params;
@@ -52,14 +48,10 @@ export const getDiscussionsByCourse = async (req: Request, res: Response): Promi
   }
 };
 
-// ============================================
-// Get a single discussion with its replies
-// ============================================
 export const getDiscussionById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
-    // Get the discussion with author info
     const discussionResult = await db.execute(
       sql`
         SELECT d.*, u.name as author_name 
@@ -74,7 +66,6 @@ export const getDiscussionById = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    // Get all replies for this discussion with author info
     const repliesResult = await db.execute(
       sql`
         SELECT r.*, u.name as author_name 
@@ -100,9 +91,6 @@ export const getDiscussionById = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// ============================================
-// Create a new discussion (Authenticated users only)
-// ============================================
 export const createDiscussion = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, content, course_id } = req.body;
@@ -113,13 +101,11 @@ export const createDiscussion = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Validate required fields
     if (!title || !content || !course_id) {
       res.status(400).json({ success: false, message: 'Title, content, and course ID are required' });
       return;
     }
 
-    // Check if course exists
     const courseCheck = await db.execute(
       sql`SELECT id FROM courses WHERE id = ${course_id}`
     );
@@ -150,9 +136,6 @@ export const createDiscussion = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ============================================
-// Update a discussion (Only the author)
-// ============================================
 export const updateDiscussion = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -164,7 +147,6 @@ export const updateDiscussion = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Check if discussion exists and belongs to the user
     const checkResult = await db.execute(
       sql`SELECT user_id FROM discussions WHERE id = ${id}`
     );
@@ -201,9 +183,6 @@ export const updateDiscussion = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ============================================
-// Delete a discussion (Only the author)
-// ============================================
 export const deleteDiscussion = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -214,7 +193,6 @@ export const deleteDiscussion = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Check if discussion exists and belongs to the user
     const checkResult = await db.execute(
       sql`SELECT user_id FROM discussions WHERE id = ${id}`
     );
@@ -229,10 +207,8 @@ export const deleteDiscussion = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Delete all replies first (foreign key constraint)
     await db.execute(sql`DELETE FROM discussion_replies WHERE discussion_id = ${id}`);
     
-    // Delete the discussion
     await db.execute(sql`DELETE FROM discussions WHERE id = ${id}`);
 
     res.status(200).json({ 
@@ -245,9 +221,6 @@ export const deleteDiscussion = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// ============================================
-// Add a reply to a discussion (Authenticated users only)
-// ============================================
 export const addReply = async (req: Request, res: Response): Promise<void> => {
   try {
     const { discussion_id, content } = req.body;
@@ -258,13 +231,11 @@ export const addReply = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Validate required fields
     if (!discussion_id || !content) {
       res.status(400).json({ success: false, message: 'Discussion ID and content are required' });
       return;
     }
 
-    // Check if discussion exists
     const discussionCheck = await db.execute(
       sql`SELECT id FROM discussions WHERE id = ${discussion_id}`
     );
@@ -295,9 +266,6 @@ export const addReply = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// ============================================
-// Delete a reply (Only the author)
-// ============================================
 export const deleteReply = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -308,7 +276,6 @@ export const deleteReply = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    // Check if reply exists and belongs to the user
     const checkResult = await db.execute(
       sql`SELECT user_id FROM discussion_replies WHERE id = ${id}`
     );

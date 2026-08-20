@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { sql, SQL } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
-// Define Course interface for type safety
 interface Course {
   id: string;
   title: string;
@@ -18,21 +17,16 @@ interface Course {
   instructor_name?: string;
 }
 
-// ============================================
-// Get all courses (with optional filters)
-// ============================================
 export const getAllCourses = async (req: Request, res: Response): Promise<void> => {
   try {
     const { category, level, status, instructorId } = req.query;
     
-    // Build the base query
     let query = sql`
       SELECT c.*, u.name as instructor_name 
       FROM courses c
       LEFT JOIN users u ON c.instructor_id = u.id
     `;
     
-    // Build WHERE conditions dynamically
     const conditions: SQL[] = [];
     
     if (category) {
@@ -48,12 +42,10 @@ export const getAllCourses = async (req: Request, res: Response): Promise<void> 
       conditions.push(sql`c.instructor_id = ${instructorId}`);
     }
     
-    // Apply WHERE clause if there are conditions
     if (conditions.length > 0) {
       query = sql`${query} WHERE ${sql.join(conditions, sql` AND `)}`;
     }
     
-    // Add ordering
     query = sql`${query} ORDER BY c.created_at DESC`;
 
     const result = await db.execute(query);
@@ -69,9 +61,6 @@ export const getAllCourses = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// ============================================
-// Get single course by ID
-// ============================================
 export const getCourseById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -102,9 +91,6 @@ export const getCourseById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// ============================================
-// Create course (Instructor only)
-// ============================================
 export const createCourse = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, category, level, price, thumbnail_url } = req.body;
@@ -136,9 +122,6 @@ export const createCourse = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// ============================================
-// Update course (Instructor or Admin only)
-// ============================================
 export const updateCourse = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -151,7 +134,6 @@ export const updateCourse = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // Check if course exists and belongs to instructor (or user is admin)
     const checkResult = await db.execute(
       sql`SELECT instructor_id FROM courses WHERE id = ${id}`
     );
@@ -190,9 +172,6 @@ export const updateCourse = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// ============================================
-// Delete course (Instructor or Admin only)
-// ============================================
 export const deleteCourse = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -230,9 +209,6 @@ export const deleteCourse = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// ============================================
-// Enroll in a course (Student only)
-// ============================================
 export const enrollCourse = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.params;
@@ -243,7 +219,6 @@ export const enrollCourse = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // Check if course exists
     const courseCheck = await db.execute(
       sql`SELECT id FROM courses WHERE id = ${courseId}`
     );
@@ -253,7 +228,6 @@ export const enrollCourse = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // Check if already enrolled
     const check = await db.execute(
       sql`SELECT id FROM enrollments WHERE student_id = ${student_id} AND course_id = ${courseId}`
     );
@@ -280,9 +254,6 @@ export const enrollCourse = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// ============================================
-// Get my enrolled courses (Student only)
-// ============================================
 export const getMyCourses = async (req: Request, res: Response): Promise<void> => {
   try {
     const student_id = req.user?.id;

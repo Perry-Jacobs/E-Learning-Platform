@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
-// Define Progress interface for type safety
 interface Progress {
   id: string;
   user_id: string;
@@ -13,16 +12,12 @@ interface Progress {
   updated_at?: Date;
 }
 
-// ============================================
-// Get all progress for a user (Security: Only own or admin)
-// ============================================
 export const getUserProgress = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.params;
     const currentUserId = req.user?.id;
     const userRole = req.user?.role;
 
-    // Security: Users can only view their own progress (except admins)
     if (currentUserId !== userId && userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'You can only view your own progress' });
       return;
@@ -49,39 +44,32 @@ export const getUserProgress = async (req: Request, res: Response): Promise<void
   }
 };
 
-// ============================================
-// Update or create progress (Authenticated user only)
-// ============================================
 export const updateProgress = async (req: Request, res: Response): Promise<void> => {
   try {
     const { course_id, content_id, status, percentage } = req.body;
-    const user_id = req.user?.id;  // ✅ Get user ID from JWT, NOT from body
+    const user_id = req.user?.id;
 
     if (!user_id) {
       res.status(401).json({ success: false, message: 'Not authenticated' });
       return;
     }
 
-    // Validate required fields
     if (!course_id || !content_id || !status) {
       res.status(400).json({ success: false, message: 'Course ID, content ID, and status are required' });
       return;
     }
 
-    // Validate status
     const validStatuses = ['not_started', 'in_progress', 'completed'];
     if (!validStatuses.includes(status)) {
       res.status(400).json({ success: false, message: 'Invalid status. Must be not_started, in_progress, or completed' });
       return;
     }
 
-    // Validate percentage
     if (percentage < 0 || percentage > 100) {
       res.status(400).json({ success: false, message: 'Percentage must be between 0 and 100' });
       return;
     }
 
-    // Verify user is enrolled in the course
     const enrollmentCheck = await db.execute(
       sql`
         SELECT id FROM enrollments 
@@ -94,7 +82,6 @@ export const updateProgress = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Verify content belongs to the course
     const contentCheck = await db.execute(
       sql`
         SELECT id FROM contents 
@@ -107,7 +94,6 @@ export const updateProgress = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Upsert progress (insert or update on conflict)
     const result = await db.execute(
       sql`
         INSERT INTO progress (user_id, course_id, content_id, status, percentage, updated_at)
@@ -131,16 +117,12 @@ export const updateProgress = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// ============================================
-// Get progress for a specific course (Security: Only own or admin)
-// ============================================
 export const getCourseProgress = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId, courseId } = req.params;
     const currentUserId = req.user?.id;
     const userRole = req.user?.role;
 
-    // Security: Users can only view their own progress (except admins)
     if (currentUserId !== userId && userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'You can only view your own progress' });
       return;
@@ -156,7 +138,6 @@ export const getCourseProgress = async (req: Request, res: Response): Promise<vo
       `
     );
 
-    // Calculate overall course progress
     let overallProgress = 0;
     if (result.rows.length > 0) {
       const totalPercentage = result.rows.reduce((sum: number, row: any) => sum + row.percentage, 0);
@@ -177,9 +158,7 @@ export const getCourseProgress = async (req: Request, res: Response): Promise<vo
     res.status(500).json({ success: false, message: 'Failed to fetch course progress' });
   }
 };
-// ============================================
-// Get course completion summary (Helper for dashboard)
-// ============================================
+
 export const getCourseCompletionSummary = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
@@ -189,7 +168,6 @@ export const getCourseCompletionSummary = async (req: Request, res: Response): P
       return;
     }
 
-    // Get all courses user is enrolled in with progress stats
     const result = await db.execute(
       sql`
         SELECT 
@@ -211,7 +189,6 @@ export const getCourseCompletionSummary = async (req: Request, res: Response): P
       `
     );
 
-    // Format the response
     const formattedData = result.rows.map((row: any) => ({
       course_id: row.course_id,
       course_title: row.course_title,

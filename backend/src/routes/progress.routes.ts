@@ -5,11 +5,10 @@ import {
   getCourseProgress,
   getCourseCompletionSummary,
 } from '../controllers';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware';
 
 const router = Router();
 
-// All progress routes require authentication
 router.use(authenticate);
 
 router.get('/user/:userId', getUserProgress);
