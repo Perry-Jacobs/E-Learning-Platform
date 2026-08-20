@@ -1,5 +1,4 @@
 import multer from 'multer';
-import path from 'path';
 import { constants } from './constants';
 
 // Configure storage (memory storage for Cloudinary)
@@ -7,7 +6,7 @@ const storage = multer.memoryStorage();
 
 // File filter function
 const fileFilter = (
-  req: any,
+  _req: any,  // ✅ Prefix with underscore = intentionally unused
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
@@ -46,7 +45,7 @@ export const multerConfig = {
   // Image upload only
   image: multer({
     storage,
-    fileFilter: (req, file, cb) => {
+    fileFilter: (_req, file, cb) => {  // ✅ _req here too
       if (constants.fileTypes.IMAGE.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -61,7 +60,7 @@ export const multerConfig = {
   // Video upload only
   video: multer({
     storage,
-    fileFilter: (req, file, cb) => {
+    fileFilter: (_req, file, cb) => {  // ✅ _req here too
       if (constants.fileTypes.VIDEO.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -76,7 +75,7 @@ export const multerConfig = {
   // Document upload only
   document: multer({
     storage,
-    fileFilter: (req, file, cb) => {
+    fileFilter: (_req, file, cb) => {  // ✅ _req here too
       if (constants.fileTypes.DOCUMENT.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -91,7 +90,7 @@ export const multerConfig = {
   // Profile picture upload
   profile: multer({
     storage,
-    fileFilter: (req, file, cb) => {
+    fileFilter: (_req, file, cb) => {  // ✅ _req here too
       if (constants.fileTypes.IMAGE.includes(file.mimetype)) {
         cb(null, true);
       } else {
