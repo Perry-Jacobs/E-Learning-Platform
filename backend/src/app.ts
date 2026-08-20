@@ -1,52 +1,31 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import dotenv from 'dotenv';
-import type { Express, Request, Response } from "express";
+import config from './config';
+import { generalRateLimiter } from './config/rate-limit.config';
 
-dotenv.config();
-
-const app: Express = express();
-const PORT = process.env.PORT || 5000;
+const app = express();
 
 // Middleware
-app.use(helmet());
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(cors(config.cors));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(generalRateLimiter);
 
-// Health check
-app.get('/api/health', (_: Request, res: Response) => {
-  res.status(200).json({
-    status: 'OK',
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
+// Test route
+app.get('/', (_: Request, res: Response) => {  // 👈 Note the types
+  res.status(200).json({ 
+    success: true, 
+    message: 'E-Learning API is running!' 
   });
 });
-
-// Routes will go here
-// app.use('/api/auth', authRoutes);
-// app.use('/api/courses', courseRoutes);
 
 // Error handling middleware
-app.use((err: any, _: Request, res: Response) => {
+app.use((err: any, _: Request, res: Response, __: any) => {
   console.error(err.stack);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal server error',
-    errors: err.errors || [],
+  res.status(500).json({ 
+    success: false, 
+    message: 'Something went wrong!' 
   });
 });
 
-// Start server
-const server = app.listen(PORT, (): void => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-});
-
-export default server;
+export default app;

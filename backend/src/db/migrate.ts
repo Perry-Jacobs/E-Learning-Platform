@@ -1,5 +1,5 @@
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { db } from './index';
+import { db } from '../config/index';
 import dotenv from 'dotenv';
 import { sql } from 'drizzle-orm';
 

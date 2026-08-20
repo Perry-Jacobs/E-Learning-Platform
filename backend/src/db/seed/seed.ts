@@ -1,4 +1,4 @@
-import { db } from '../index';
+import { db } from '../../config/index';
 import { users, courses, chapters, quizzes, assignments } from '../schema';
 import { hash } from 'bcryptjs';
 import { sql } from 'drizzle-orm';
