@@ -1,5 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 
+/**
+ * Global error handling middleware
+ * Catches and formats all errors consistently
+ */
 export const errorHandler = (
   err: any,
   _: Request,
@@ -11,13 +15,22 @@ export const errorHandler = (
   const statusCode = err.status || 500;
   const message = err.message || 'Internal Server Error';
 
-  res.status(statusCode).json({
+  const response: any = {
     success: false,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
+  };
+
+  if (process.env.NODE_ENV === 'development') {
+    response.stack = err.stack;
+  }
+
+  res.status(statusCode).json(response);
 };
 
+/**
+ * 404 Not Found middleware
+ * Handles routes that don't exist
+ */
 export const notFound = (req: Request, res: Response): void => {
   res.status(404).json({
     success: false,

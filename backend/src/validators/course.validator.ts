@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+/**
+ * Validation schema for creating a new course
+ * Validates course details including title, description, level, and pricing
+ */
 export const createCourseSchema = z.object({
   body: z.object({
     title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -11,6 +15,10 @@ export const createCourseSchema = z.object({
   }),
 });
 
+/**
+ * Validation schema for updating an existing course
+ * Validates course ID in params and optional update fields in body
+ */
 export const updateCourseSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid course ID format'),
@@ -26,6 +34,10 @@ export const updateCourseSchema = z.object({
   }),
 });
 
+/**
+ * Validation schema for course enrollment
+ * Validates course ID format in params
+ */
 export const enrollCourseSchema = z.object({
   params: z.object({
     courseId: z.string().uuid('Invalid course ID format'),

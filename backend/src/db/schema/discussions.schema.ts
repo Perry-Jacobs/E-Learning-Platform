@@ -12,6 +12,9 @@ import { relations } from 'drizzle-orm';
 import { users } from './users.schema';
 import { courses } from './courses.schema';
 
+/**
+ * Threads table schema (discussion topics)
+ */
 export const threads = pgTable('threads', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: text('title').notNull(),
@@ -33,6 +36,9 @@ export const threads = pgTable('threads', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+/**
+ * Replies table schema (responses to threads)
+ */
 export const replies = pgTable('replies', {
   id: uuid('id').defaultRandom().primaryKey(),
   content: text('content').notNull(),
@@ -51,7 +57,6 @@ export const replies = pgTable('replies', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Relations with proper imports
 export const threadsRelations = relations(threads, ({ one, many }) => ({
   author: one(users, {
     fields: [threads.authorId],
@@ -64,7 +69,6 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
   replies: many(replies),
 }));
 
-// Replies relations
 export const repliesRelations = relations(replies, ({ one }) => ({
   author: one(users, {
     fields: [replies.authorId],
@@ -80,7 +84,6 @@ export const repliesRelations = relations(replies, ({ one }) => ({
   }),
 }));
 
-// Types
 export type Thread = typeof threads.$inferSelect;
 export type NewThread = typeof threads.$inferInsert;
 export type Reply = typeof replies.$inferSelect;

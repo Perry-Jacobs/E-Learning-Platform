@@ -5,28 +5,29 @@ import { sql } from 'drizzle-orm';
 
 dotenv.config();
 
+/**
+ * Run database migrations
+ */
 async function main() {
   try {
-    console.log('⏳ Starting database migration...');
+    console.log('Starting database migration...');
     
-    // Check connection
     await db.execute(sql`SELECT 1`);
-    console.log('✅ Database connection established');
+    console.log('Database connection established');
 
-    // Run migrations
     await migrate(db, { 
       migrationsFolder: './src/db/migrations',
     });
     
-    console.log('✅ Migrations completed successfully!');
-    console.log('📊 Database schema is up to date.');
+    console.log('Migrations completed successfully');
+    console.log('Database schema is up to date');
     
     process.exit(0);
   } catch (error) {
     const err = error as Error;
-    console.error('❌ Migration failed:', err.message);
+    console.error('Migration failed:', err.message);
     if (err.stack) {
-      console.error('📝 Stack trace:', err.stack);
+      console.error('Stack trace:', err.stack);
     }
     process.exit(1);
   }

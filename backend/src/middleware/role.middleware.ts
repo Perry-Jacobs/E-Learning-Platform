@@ -1,5 +1,10 @@
 import type { Request, Response, NextFunction } from 'express';
 
+/**
+ * Role-based authorization middleware factory
+ * @param roles - List of roles allowed to access the route
+ * @returns Middleware function that checks user role
+ */
 export const authorize = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {

@@ -29,7 +29,6 @@ export const quizzes = pgTable('quizzes', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Relations with proper imports
 export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   course: one(courses, {
     fields: [quizzes.courseId],
@@ -38,11 +37,12 @@ export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   submissions: many(submissions),
 }));
 
-// Types
 export type Quiz = typeof quizzes.$inferSelect;
 export type NewQuiz = typeof quizzes.$inferInsert;
 
-// Question Type Definitions
+/**
+ * Question definition for quiz questions stored in JSONB
+ */
 export interface Question {
   id: string;
   type: 'multiple-choice' | 'true-false' | 'short-answer' | 'essay';

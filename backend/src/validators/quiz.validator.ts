@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+/**
+ * Validation schema for creating a new quiz
+ * Validates quiz title, description, course association, and questions
+ */
 export const createQuizSchema = z.object({
   body: z.object({
     title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -18,6 +22,10 @@ export const createQuizSchema = z.object({
   }),
 });
 
+/**
+ * Validation schema for updating an existing quiz
+ * Validates quiz ID in params and optional update fields in body
+ */
 export const updateQuizSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid quiz ID format'),
@@ -38,6 +46,10 @@ export const updateQuizSchema = z.object({
   }),
 });
 
+/**
+ * Validation schema for submitting a quiz attempt
+ * Validates quiz ID and answers object structure
+ */
 export const submitQuizAttemptSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid quiz ID format'),
@@ -47,6 +59,10 @@ export const submitQuizAttemptSchema = z.object({
   }),
 });
 
+/**
+ * Validation schema for retrieving quiz results
+ * Validates quiz ID format
+ */
 export const getQuizResultsSchema = z.object({
   params: z.object({
     quizId: z.string().uuid('Invalid quiz ID format'),

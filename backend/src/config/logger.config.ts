@@ -1,11 +1,13 @@
 import winston from 'winston';
 import path from 'path';
-import fs from 'fs';  // ✅ Use import instead of require
+import fs from 'fs';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Define log levels
+/**
+ * Log level definitions
+ */
 const levels = {
   error: 0,
   warn: 1,
@@ -14,7 +16,9 @@ const levels = {
   debug: 4,
 };
 
-// Define log colors
+/**
+ * Color mapping for console output
+ */
 const colors = {
   error: 'red',
   warn: 'yellow',
@@ -23,11 +27,12 @@ const colors = {
   debug: 'white',
 };
 
-// Add colors to winston
 winston.addColors(colors);
 
-// Define log format
-const logFormat = winston.format.combine(
+/**
+ * Console log format
+ */
+const consoleFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
@@ -35,67 +40,69 @@ const logFormat = winston.format.combine(
   )
 );
 
-// Define file format (without colorization)
+/**
+ * File log format (JSON)
+ */
 const fileFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.json()
 );
 
-// Create logs directory if it doesn't exist
+/**
+ * Ensure logs directory exists
+ */
 const logsDir = path.join(process.cwd(), 'logs');
 try {
-  if (!fs.existsSync(logsDir)) {  // ✅ Use fs.existsSync
+  if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
   }
 } catch (error) {
-  console.warn('Could not create logs directory:', error);
+  const err = error as Error;
+  console.warn('Could not create logs directory:', err.message);
 }
 
-// Create logger instance
+/**
+ * Main logger instance
+ */
 export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'development' ? 'debug' : 'info'),
   levels,
-  format: logFormat,
+  format: consoleFormat,
   transports: [
-    // Console transport
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-        winston.format.colorize({ all: true }),
-        winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      ),
+      format: consoleFormat,
     }),
   ],
   exitOnError: false,
 });
 
-// Add file transports in production or when explicitly enabled
+/**
+ * Add file transports in production
+ */
 if (process.env.NODE_ENV === 'production' || process.env.ENABLE_LOGGING === 'true') {
-  // Error log file
   logger.add(
     new winston.transports.File({
       filename: path.join(logsDir, 'error.log'),
       level: 'error',
       format: fileFormat,
-      maxsize: 5242880, // 5MB
+      maxsize: 5242880,
       maxFiles: 5,
     })
   );
 
-  // Combined log file
   logger.add(
     new winston.transports.File({
       filename: path.join(logsDir, 'combined.log'),
       format: fileFormat,
-      maxsize: 5242880, // 5MB
+      maxsize: 5242880,
       maxFiles: 5,
     })
   );
 }
 
-// Export helper functions
+/**
+ * Convenience logging functions
+ */
 export const log = {
   error: (message: string, meta?: any) => logger.error(message, meta),
   warn: (message: string, meta?: any) => logger.warn(message, meta),
@@ -104,7 +111,9 @@ export const log = {
   debug: (message: string, meta?: any) => logger.debug(message, meta),
 };
 
-// Stream for Morgan integration
+/**
+ * Stream for Morgan integration
+ */
 export const stream = {
   write: (message: string) => {
     logger.http(message.trim());

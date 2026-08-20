@@ -3,7 +3,6 @@ import { users, courses, chapters, quizzes, assignments } from '../schema';
 import { hash } from 'bcryptjs';
 import { sql } from 'drizzle-orm';
 
-// Define the Question type to match the schema
 interface Question {
   id: string;
   type: 'multiple-choice' | 'true-false' | 'short-answer' | 'essay';
@@ -14,11 +13,13 @@ interface Question {
   explanation?: string;
 }
 
+/**
+ * Seed the database with sample data
+ */
 async function seed() {
   try {
-    console.log('🌱 Starting database seeding...');
+    console.log('Starting database seeding...');
 
-    // Clear existing data
     await db.execute(sql`
       TRUNCATE TABLE 
         users, 
@@ -28,9 +29,8 @@ async function seed() {
         assignments 
       CASCADE;
     `);
-    console.log('🧹 Cleared existing data');
+    console.log('Cleared existing data');
 
-    // Create sample users
     const hashedPassword = await hash('password123', 10);
     
     const lecturer = await db.insert(users).values({
@@ -60,12 +60,11 @@ async function seed() {
       isVerified: true,
     }).returning();
 
-    console.log('✅ Created users:');
+    console.log('Created users:');
     console.log(`   - ${lecturer[0].fullName} (${lecturer[0].role})`);
     console.log(`   - ${student1[0].fullName} (${student1[0].role})`);
     console.log(`   - ${student2[0].fullName} (${student2[0].role})`);
 
-    // Create sample course
     const course = await db.insert(courses).values({
       title: 'Complete Web Development Bootcamp 2024',
       slug: 'complete-web-development-bootcamp-2024',
@@ -95,9 +94,8 @@ async function seed() {
       students: [student1[0].id, student2[0].id],
     }).returning();
 
-    console.log(`✅ Created course: "${course[0].title}"`);
+    console.log(`Created course: "${course[0].title}"`);
 
-    // Create sample chapters
     await db.insert(chapters).values({
       title: 'Introduction to Web Development',
       description: 'Understand the fundamentals of web development, how the web works, and what tools you need to get started.',
@@ -131,9 +129,8 @@ async function seed() {
       courseId: course[0].id,
     });
 
-    console.log(`✅ Created ${3} chapters for the course`);
+    console.log(`Created 3 chapters for the course`);
 
-    // Define questions with proper typing
     const questions: Question[] = [
       {
         id: 'q1',
@@ -196,7 +193,6 @@ async function seed() {
       }
     ];
 
-    // Create sample quiz with typed questions
     const quiz = await db.insert(quizzes).values({
       title: 'HTML & CSS Fundamentals Quiz',
       description: 'Test your knowledge of HTML and CSS basics. This quiz covers topics from the first three chapters.',
@@ -206,12 +202,11 @@ async function seed() {
       shuffleQuestions: true,
       shuffleOptions: true,
       courseId: course[0].id,
-      questions: questions as any, // Type assertion to handle JSONB
+      questions: questions as any,
     }).returning();
 
-    console.log(`✅ Created quiz: "${quiz[0].title}" with ${(quiz[0].questions as Question[]).length} questions`);
+    console.log(`Created quiz: "${quiz[0].title}" with ${(quiz[0].questions as Question[]).length} questions`);
 
-    // Create sample assignment
     await db.insert(assignments).values({
       title: 'Build Your Personal Portfolio',
       description: 'Create a personal portfolio website using HTML and CSS. The portfolio should include:\n- About Me section\n- Projects gallery\n- Contact form\n- Resume download link',
@@ -223,16 +218,16 @@ async function seed() {
       courseId: course[0].id,
     });
 
-    console.log(`✅ Created assignment: "Build Your Personal Portfolio"`);
+    console.log(`Created assignment: "Build Your Personal Portfolio"`);
     
-    console.log('\n🎉 Database seeding completed successfully!');
-    console.log('📊 Summary:');
-    console.log(`   - ${3} users (1 lecturer, 2 students)`);
-    console.log(`   - ${1} course`);
-    console.log(`   - ${3} chapters`);
-    console.log(`   - ${1} quiz with ${(quiz[0].questions as Question[]).length} questions`);
-    console.log(`   - ${1} assignment`);
-    console.log('\n💡 Test Credentials:');
+    console.log('\nDatabase seeding completed successfully');
+    console.log('Summary:');
+    console.log(`   - 3 users (1 lecturer, 2 students)`);
+    console.log(`   - 1 course`);
+    console.log(`   - 3 chapters`);
+    console.log(`   - 1 quiz with ${(quiz[0].questions as Question[]).length} questions`);
+    console.log(`   - 1 assignment`);
+    console.log('\nTest Credentials:');
     console.log(`   Lecturer: john.smith@university.com / password123`);
     console.log(`   Student: alice.johnson@student.com / password123`);
     console.log(`   Student: bob.williams@student.com / password123`);
@@ -240,9 +235,9 @@ async function seed() {
     process.exit(0);
   } catch (error) {
     const err = error as Error;
-    console.error('❌ Seeding failed:', err.message);
+    console.error('Seeding failed:', err.message);
     if (err.stack) {
-      console.error('📝 Stack trace:', err.stack);
+      console.error('Stack trace:', err.stack);
     }
     process.exit(1);
   }

@@ -57,7 +57,7 @@ export async function clearDatabase(): Promise<void> {
         replies 
       CASCADE;
     `);
-    console.log('✅ Database cleared successfully');
+    console.log('Database cleared successfully');
   } catch (error) {
     const err = error as Error;
     console.error('Error clearing database:', err.message);
@@ -127,7 +127,7 @@ export interface DatabaseStats {
 }
 
 /**
- * Get database statistics with proper typing - converts string values to numbers
+ * Get database statistics with proper typing
  */
 export async function getDatabaseStatsTyped(): Promise<DatabaseStats | null> {
   try {
@@ -150,7 +150,6 @@ export async function getDatabaseStatsTyped(): Promise<DatabaseStats | null> {
       return null;
     }
 
-    // Convert string values to numbers
     const stats: DatabaseStats = {
       total_users: parseInt(String(row.total_users), 10),
       total_students: parseInt(String(row.total_students), 10),

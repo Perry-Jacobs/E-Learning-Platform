@@ -21,7 +21,6 @@ export const emailConfig: EmailConfig = {
   from: process.env.SMTP_FROM || 'noreply@e-learning-platform.com',
 };
 
-// Create transporter
 export const transporter = nodemailer.createTransport({
   host: emailConfig.host,
   port: emailConfig.port,
@@ -35,22 +34,27 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
-// Test email connection
+/**
+ * Test email connection
+ */
 export async function testEmailConnection(): Promise<boolean> {
   try {
     await transporter.verify();
-    console.log('✅ Email connection successful');
+    console.log('Email connection successful');
     return true;
   } catch (error) {
-    console.error('❌ Email connection failed:', error);
+    const err = error as Error;
+    console.error('Email connection failed:', err.message);
     return false;
   }
 }
 
-// Email templates
+/**
+ * Email template definitions
+ */
 export const emailTemplates = {
   welcome: (name: string, email: string) => ({
-    subject: 'Welcome to E-Learning Platform! 🎓',
+    subject: 'Welcome to E-Learning Platform',
     html: `
       <!DOCTYPE html>
       <html>
@@ -68,7 +72,7 @@ export const emailTemplates = {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Welcome to E-Learning Platform 🎓</h1>
+            <h1>Welcome to E-Learning Platform</h1>
           </div>
           <div class="content">
             <h2>Hi ${name},</h2>
@@ -80,7 +84,7 @@ export const emailTemplates = {
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} E-Learning Platform. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} E-Learning Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -119,7 +123,7 @@ export const emailTemplates = {
   }),
 
   courseEnrollment: (courseName: string, studentName: string) => ({
-    subject: `You're enrolled in ${courseName}!`,
+    subject: `You're enrolled in ${courseName}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -133,7 +137,7 @@ export const emailTemplates = {
       </head>
       <body>
         <div class="container">
-          <h1>🎉 Congratulations ${studentName}!</h1>
+          <h1>Congratulations ${studentName}!</h1>
           <p>You've successfully enrolled in <strong>${courseName}</strong>.</p>
           <p>Start learning now and track your progress.</p>
           <p style="text-align: center;">
@@ -160,7 +164,7 @@ export const emailTemplates = {
       </head>
       <body>
         <div class="container">
-          <h1>📝 Assignment Graded</h1>
+          <h1>Assignment Graded</h1>
           <p>Your assignment <strong>${assignmentName}</strong> has been graded.</p>
           <div class="score">${score}%</div>
           ${feedback ? `<div class="feedback"><strong>Feedback:</strong> ${feedback}</div>` : ''}
@@ -185,7 +189,7 @@ export const emailTemplates = {
       </head>
       <body>
         <div class="container">
-          <h1>📊 Quiz Completed!</h1>
+          <h1>Quiz Completed!</h1>
           <p>You've completed the quiz <strong>${quizName}</strong>.</p>
           <div class="score">${score}%</div>
           <p><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/quizzes">View Quiz History</a></p>
@@ -196,7 +200,9 @@ export const emailTemplates = {
   }),
 };
 
-// Send email function
+/**
+ * Send email function
+ */
 export async function sendEmail(
   to: string, 
   subject: string, 
@@ -209,9 +215,10 @@ export async function sendEmail(
       subject,
       html,
     });
-    console.log('✅ Email sent:', info.messageId);
+    console.log('Email sent:', info.messageId);
   } catch (error) {
-    console.error('❌ Email send failed:', error);
+    const err = error as Error;
+    console.error('Email send failed:', err.message);
     throw error;
   }
 }

@@ -1,14 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../config/jwt.config';
+import { User } from '../types/api.types';
 
+/**
+ * Extend Express Request to include user property
+ */
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: User;
     }
   }
 }
 
+/**
+ * Authentication middleware
+ * Verifies JWT token from Authorization header
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next function
+ */
 export const authenticate = async (
   req: Request,
   res: Response,
@@ -23,9 +34,10 @@ export const authenticate = async (
 
     const token = authHeader.split(' ')[1];
     const decoded = verifyAccessToken(token);
-    req.user = decoded;
+    req.user = decoded as User;
     next();
   } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    const errorMessage = error instanceof Error ? error.message : 'Invalid or expired token';
+    res.status(401).json({ success: false, message: errorMessage });
   }
 };

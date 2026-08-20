@@ -1,7 +1,14 @@
 import jwt from 'jsonwebtoken';
 import { jwtConfig, TokenPayload } from '../config/jwt.config';
 
-// Generate access and refresh tokens for a user
+/**
+ * Generates access and refresh tokens for a user
+ * @param {Object} user - User object containing id, email, and role
+ * @param {string} user.id - User ID
+ * @param {string} user.email - User email
+ * @param {string} user.role - User role
+ * @returns {Object} Object containing accessToken and refreshToken
+ */
 export const generateTokens = (user: { id: string; email: string; role: string }) => {
   const accessToken = jwt.sign(
     {
@@ -35,43 +42,64 @@ export const generateTokens = (user: { id: string; email: string; role: string }
   return { accessToken, refreshToken };
 };
 
-// Verify an access token
+/**
+ * Verifies and decodes an access token
+ * @param {string} token - JWT access token to verify
+ * @returns {TokenPayload} Decoded token payload
+ * @throws {Error} If token is invalid or expired
+ */
 export const verifyAccessToken = (token: string): TokenPayload => {
   try {
     const decoded = jwt.verify(token, jwtConfig.accessSecret) as TokenPayload;
     return decoded;
   } catch (error) {
-    throw new Error('Invalid access token');
+    const errorMessage = error instanceof Error ? error.message : 'Invalid access token';
+    throw new Error(`Invalid access token: ${errorMessage}`);
   }
 };
 
-// Verify a refresh token
+/**
+ * Verifies and decodes a refresh token
+ * @param {string} token - JWT refresh token to verify
+ * @returns {TokenPayload} Decoded token payload
+ * @throws {Error} If token is invalid or expired
+ */
 export const verifyRefreshToken = (token: string): TokenPayload => {
   try {
     const decoded = jwt.verify(token, jwtConfig.refreshSecret) as TokenPayload;
     return decoded;
   } catch (error) {
-    throw new Error('Invalid refresh token');
+    const errorMessage = error instanceof Error ? error.message : 'Invalid refresh token';
+    throw new Error(`Invalid refresh token: ${errorMessage}`);
   }
 };
 
-// Decode a token without verification (for checking expiry, etc.)
+/**
+ * Decodes a JWT token without verification
+ * Useful for checking token expiry or structure without verifying signature
+ * @param {string} token - JWT token to decode
+ * @returns {TokenPayload | null} Decoded token payload or null if invalid
+ */
 export const decodeToken = (token: string): TokenPayload | null => {
   try {
     const decoded = jwt.decode(token) as TokenPayload;
     return decoded;
-  } catch (error) {
+  } catch {
     return null;
   }
 };
 
-// Check if a token is expired
+/**
+ * Checks if a JWT token has expired
+ * @param {string} token - JWT token to check
+ * @returns {boolean} True if token is expired, false otherwise
+ */
 export const isTokenExpired = (token: string): boolean => {
   try {
     const decoded = jwt.decode(token) as { exp?: number };
     if (!decoded || !decoded.exp) return true;
     return Date.now() >= decoded.exp * 1000;
-  } catch (error) {
+  } catch {
     return true;
   }
 };

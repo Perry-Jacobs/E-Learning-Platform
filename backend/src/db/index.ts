@@ -5,8 +5,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create PostgreSQL connection pool
-const pool = new Pool({
+/**
+ * PostgreSQL connection pool
+ */
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' 
     ? { rejectUnauthorized: false } 
@@ -16,22 +18,20 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
-// Test connection
 pool.on('connect', () => {
-  console.log('✅ Connected to PostgreSQL database');
+  console.log('Connected to PostgreSQL database');
 });
 
 pool.on('error', (err: Error & { code?: string }) => {
-  console.error('❌ PostgreSQL connection error:', err.message);
+  console.error('PostgreSQL connection error:', err.message);
   if (err.code === 'ECONNREFUSED') {
-    console.error('❌ Database connection refused. Please check if PostgreSQL is running.');
+    console.error('Database connection refused. Please check if PostgreSQL is running.');
   }
 });
 
-// Create Drizzle instance with schema
+/**
+ * Drizzle ORM instance
+ */
 export const db = drizzle(pool, { schema });
-
-// Export pool for raw queries if needed
-export { pool };
 
 export type DB = typeof db;

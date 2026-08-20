@@ -1,3 +1,7 @@
+/**
+ * Standard API response wrapper
+ * @template T - Type of data payload
+ */
 export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
@@ -6,11 +10,13 @@ export interface ApiResponse<T = any> {
   meta?: PaginationMeta;
 }
 
+/** Represents a validation or business logic error */
 export interface ApiError {
   field?: string;
   message: string;
 }
 
+/** Pagination metadata for list responses */
 export interface PaginationMeta {
   page: number;
   limit: number;
@@ -18,6 +24,7 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
+/** User entity representing a system user */
 export interface User {
   id: string;
   email: string;
@@ -27,8 +34,10 @@ export interface User {
   updated_at?: Date;
 }
 
+/** Available user roles in the system */
 export type UserRole = 'student' | 'lecturer' | 'admin';
 
+/** User registration request payload */
 export interface RegisterRequest {
   email: string;
   password: string;
@@ -36,17 +45,20 @@ export interface RegisterRequest {
   role?: UserRole;
 }
 
+/** User login request payload */
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
+/** Authentication response containing user and tokens */
 export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
 }
 
+/** JWT token payload structure */
 export interface TokenPayload {
   id: string;
   email: string;
@@ -54,6 +66,7 @@ export interface TokenPayload {
   type?: 'access' | 'refresh';
 }
 
+/** Course entity representing a learning course */
 export interface Course {
   id: string;
   title: string;
@@ -69,8 +82,10 @@ export interface Course {
   instructor_name?: string;
 }
 
+/** Course publication status */
 export type CourseStatus = 'draft' | 'published' | 'archived';
 
+/** Course creation request payload */
 export interface CreateCourseRequest {
   title: string;
   description?: string;
@@ -80,10 +95,12 @@ export interface CreateCourseRequest {
   thumbnail_url?: string;
 }
 
+/** Course update request payload */
 export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
   status?: CourseStatus;
 }
 
+/** Assignment entity */
 export interface Assignment {
   id: string;
   title: string;
@@ -96,6 +113,7 @@ export interface Assignment {
   updated_at?: Date;
 }
 
+/** Assignment submission entity */
 export interface AssignmentSubmission {
   id: string;
   assignment_id: string;
@@ -108,6 +126,7 @@ export interface AssignmentSubmission {
   graded_at: Date | null;
 }
 
+/** Quiz entity */
 export interface Quiz {
   id: string;
   title: string;
@@ -119,6 +138,7 @@ export interface Quiz {
   updated_at?: Date;
 }
 
+/** Quiz question entity */
 export interface QuizQuestion {
   id: string;
   quiz_id: string;
@@ -129,6 +149,7 @@ export interface QuizQuestion {
   order_index: number;
 }
 
+/** Quiz attempt entity */
 export interface QuizAttempt {
   id: string;
   quiz_id: string;
@@ -138,6 +159,7 @@ export interface QuizAttempt {
   attempted_at?: Date;
 }
 
+/** Discussion entity */
 export interface Discussion {
   id: string;
   title: string;
@@ -149,6 +171,7 @@ export interface Discussion {
   author_name?: string;
 }
 
+/** Discussion reply entity */
 export interface DiscussionReply {
   id: string;
   discussion_id: string;
@@ -159,6 +182,7 @@ export interface DiscussionReply {
   author_name?: string;
 }
 
+/** Content entity (video, document, etc.) */
 export interface Content {
   id: string;
   title: string;
@@ -172,8 +196,10 @@ export interface Content {
   updated_at?: Date;
 }
 
+/** Available content types */
 export type ContentType = 'video' | 'document' | 'article' | 'quiz' | 'assignment';
 
+/** Progress tracking entity */
 export interface Progress {
   id: string;
   user_id: string;
@@ -184,8 +210,10 @@ export interface Progress {
   updated_at?: Date;
 }
 
+/** Progress status options */
 export type ProgressStatus = 'not_started' | 'in_progress' | 'completed';
 
+/** Notification types */
 export type NotificationType =
   | 'welcome'
   | 'course_enrollment'
@@ -194,6 +222,7 @@ export type NotificationType =
   | 'discussion_reply'
   | 'password_reset';
 
+/** Notification entity */
 export interface Notification {
   id: string;
   user_id: string;
@@ -204,8 +233,10 @@ export interface Notification {
   created_at?: Date;
 }
 
+/** File upload types */
 export type FileUploadType = 'image' | 'video' | 'document' | 'profile';
 
+/** File upload result from Cloudinary */
 export interface FileUploadResult {
   public_id: string;
   secure_url: string;
@@ -216,6 +247,7 @@ export interface FileUploadResult {
   duration?: number;
 }
 
+/** Pagination query parameters */
 export interface PaginationQuery {
   page?: number;
   limit?: number;
@@ -223,11 +255,13 @@ export interface PaginationQuery {
   order?: 'asc' | 'desc';
 }
 
+/** Paginated response wrapper */
 export interface PaginatedResponse<T> {
   data: T[];
   meta: PaginationMeta;
 }
 
+/** Custom application error with optional status code */
 export interface AppError extends Error {
   status?: number;
   code?: string;

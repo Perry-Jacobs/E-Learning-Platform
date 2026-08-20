@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Cloudinary configuration
+/**
+ * Cloudinary configuration settings
+ */
 export const cloudinaryConfig = {
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -19,9 +21,10 @@ cloudinary.config({
   secure: cloudinaryConfig.secure,
 });
 
-// Upload configurations for different file types
+/**
+ * Upload configurations for different file types
+ */
 export const uploadConfig = {
-  // Video upload settings
   video: {
     resource_type: 'video' as const,
     folder: 'e-learning/videos',
@@ -31,9 +34,8 @@ export const uploadConfig = {
       { fetch_format: 'auto' },
       { bit_rate: '8000k' },
     ],
-    max_bytes: 500 * 1024 * 1024, // 500MB
+    max_bytes: 500 * 1024 * 1024,
   },
-  // Image upload settings
   image: {
     resource_type: 'image' as const,
     folder: 'e-learning/images',
@@ -43,23 +45,20 @@ export const uploadConfig = {
       { quality: 'auto' },
       { fetch_format: 'auto' },
     ],
-    max_bytes: 10 * 1024 * 1024, // 10MB
+    max_bytes: 10 * 1024 * 1024,
   },
-  // Document upload settings
   document: {
     resource_type: 'raw' as const,
     folder: 'e-learning/documents',
     allowed_formats: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'csv'],
-    max_bytes: 50 * 1024 * 1024, // 50MB
+    max_bytes: 50 * 1024 * 1024,
   },
-  // Assignment submission upload
   assignment: {
     resource_type: 'raw' as const,
     folder: 'e-learning/assignments',
     allowed_formats: ['pdf', 'doc', 'docx', 'zip', 'rar', '7z'],
-    max_bytes: 50 * 1024 * 1024, // 50MB
+    max_bytes: 50 * 1024 * 1024,
   },
-  // Profile picture upload
   profile: {
     resource_type: 'image' as const,
     folder: 'e-learning/profiles',
@@ -69,11 +68,13 @@ export const uploadConfig = {
       { quality: 'auto' },
       { fetch_format: 'auto' },
     ],
-    max_bytes: 5 * 1024 * 1024, // 5MB
+    max_bytes: 5 * 1024 * 1024,
   },
 };
 
-// Upload helper functions
+/**
+ * Upload options interface
+ */
 export interface UploadOptions {
   folder?: string;
   resource_type?: 'image' | 'video' | 'raw' | 'auto';
@@ -82,12 +83,14 @@ export interface UploadOptions {
   max_bytes?: number;
 }
 
+/**
+ * Upload a file to Cloudinary
+ */
 export async function uploadToCloudinary(
   file: string | Buffer,
   options: UploadOptions = {}
 ) {
   try {
-    // Convert Buffer to base64 string if needed
     let uploadFile: string = file as string;
     if (Buffer.isBuffer(file)) {
       uploadFile = `data:image/jpeg;base64,${file.toString('base64')}`;
@@ -102,12 +105,15 @@ export async function uploadToCloudinary(
     });
     return result;
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    const err = error as Error;
+    console.error('Cloudinary upload error:', err.message);
     throw error;
   }
 }
 
-// Alternative: Upload with explicit file path (string only)
+/**
+ * Upload a file using file path
+ */
 export async function uploadFileToCloudinary(
   filePath: string,
   options: UploadOptions = {}
@@ -122,27 +128,36 @@ export async function uploadFileToCloudinary(
     });
     return result;
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    const err = error as Error;
+    console.error('Cloudinary upload error:', err.message);
     throw error;
   }
 }
 
+/**
+ * Delete a file from Cloudinary
+ */
 export async function deleteFromCloudinary(publicId: string) {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
     return result;
   } catch (error) {
-    console.error('Cloudinary delete error:', error);
+    const err = error as Error;
+    console.error('Cloudinary delete error:', err.message);
     throw error;
   }
 }
 
+/**
+ * Delete multiple files from Cloudinary
+ */
 export async function deleteMultipleFromCloudinary(publicIds: string[]) {
   try {
     const result = await cloudinary.api.delete_resources(publicIds);
     return result;
   } catch (error) {
-    console.error('Cloudinary bulk delete error:', error);
+    const err = error as Error;
+    console.error('Cloudinary bulk delete error:', err.message);
     throw error;
   }
 }

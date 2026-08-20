@@ -2,7 +2,9 @@ import { RateLimitRequestHandler } from 'express-rate-limit';
 import rateLimit from 'express-rate-limit';
 import { constants } from './constants';
 
-// General rate limiter
+/**
+ * General rate limiter
+ */
 export const generalRateLimiter: RateLimitRequestHandler = rateLimit({
   windowMs: constants.rateLimit.WINDOW_MS,
   max: constants.rateLimit.MAX_REQUESTS,
@@ -14,10 +16,12 @@ export const generalRateLimiter: RateLimitRequestHandler = rateLimit({
   legacyHeaders: false,
 });
 
-// Stricter rate limiter for authentication
+/**
+ * Stricter rate limiter for authentication
+ */
 export const authRateLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 5,
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later.',
@@ -27,10 +31,12 @@ export const authRateLimiter: RateLimitRequestHandler = rateLimit({
   skipSuccessfulRequests: true,
 });
 
-// Rate limiter for file uploads
+/**
+ * Rate limiter for file uploads
+ */
 export const uploadRateLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // 10 uploads per hour
+  windowMs: 60 * 60 * 1000,
+  max: 10,
   message: {
     success: false,
     message: 'Too many uploads, please try again later.',
@@ -39,10 +45,12 @@ export const uploadRateLimiter: RateLimitRequestHandler = rateLimit({
   legacyHeaders: false,
 });
 
-// Rate limiter for API endpoints
+/**
+ * Rate limiter for API endpoints
+ */
 export const apiRateLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 30, // 30 requests per minute
+  windowMs: 60 * 1000,
+  max: 30,
   message: {
     success: false,
     message: 'Too many API requests, please slow down.',
@@ -51,10 +59,12 @@ export const apiRateLimiter: RateLimitRequestHandler = rateLimit({
   legacyHeaders: false,
 });
 
-// Rate limiter for specific IPs (optional)
+/**
+ * Strict rate limiter for specific IPs
+ */
 export const strictRateLimiter: RateLimitRequestHandler = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 3, // 3 requests per 5 minutes
+  windowMs: 5 * 60 * 1000,
+  max: 3,
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',

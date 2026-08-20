@@ -28,7 +28,9 @@ export interface TokenPayload {
   type?: 'access' | 'refresh';
 }
 
-// Generate tokens
+/**
+ * Generate access and refresh tokens
+ */
 export function generateTokens(user: { id: string; email: string; role: string }) {
   const accessToken = jwt.sign(
     { 
@@ -62,27 +64,35 @@ export function generateTokens(user: { id: string; email: string; role: string }
   return { accessToken, refreshToken };
 }
 
-// Verify access token
+/**
+ * Verify access token
+ */
 export function verifyAccessToken(token: string): TokenPayload {
   try {
     const decoded = jwt.verify(token, jwtConfig.accessSecret) as TokenPayload;
     return decoded;
   } catch (error) {
-    throw new Error('Invalid access token');
+    const err = error as Error;
+    throw new Error(`Invalid access token: ${err.message}`);
   }
 }
 
-// Verify refresh token
+/**
+ * Verify refresh token
+ */
 export function verifyRefreshToken(token: string): TokenPayload {
   try {
     const decoded = jwt.verify(token, jwtConfig.refreshSecret) as TokenPayload;
     return decoded;
   } catch (error) {
-    throw new Error('Invalid refresh token');
+    const err = error as Error;
+    throw new Error(`Invalid refresh token: ${err.message}`);
   }
 }
 
-// Decode token without verification
+/**
+ * Decode token without verification
+ */
 export function decodeToken(token: string): TokenPayload | null {
   try {
     const decoded = jwt.decode(token) as TokenPayload;
@@ -92,7 +102,9 @@ export function decodeToken(token: string): TokenPayload | null {
   }
 }
 
-// Check if token is expired
+/**
+ * Check if token is expired
+ */
 export function isTokenExpired(token: string): boolean {
   try {
     const decoded = jwt.decode(token) as { exp?: number };

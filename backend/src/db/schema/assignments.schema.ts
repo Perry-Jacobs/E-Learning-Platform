@@ -12,6 +12,10 @@ import { relations } from 'drizzle-orm';
 import { courses } from './courses.schema';
 import { submissions } from './submissions.schema';
 
+/**
+ * Assignments table schema
+ * Stores course assignments with submission settings
+ */
 export const assignments = pgTable('assignments', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
@@ -29,7 +33,6 @@ export const assignments = pgTable('assignments', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Relations with proper imports
 export const assignmentsRelations = relations(assignments, ({ one, many }) => ({
   course: one(courses, {
     fields: [assignments.courseId],
@@ -38,6 +41,5 @@ export const assignmentsRelations = relations(assignments, ({ one, many }) => ({
   submissions: many(submissions),
 }));
 
-// Types
 export type Assignment = typeof assignments.$inferSelect;
 export type NewAssignment = typeof assignments.$inferInsert;

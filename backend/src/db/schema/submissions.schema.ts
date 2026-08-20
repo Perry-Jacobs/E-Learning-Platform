@@ -12,6 +12,10 @@ import { users } from './users.schema';
 import { assignments } from './assignments.schema';
 import { quizzes } from './quizzes.schema';
 
+/**
+ * Submissions table schema
+ * Stores student submissions for assignments and quizzes
+ */
 export const submissions = pgTable('submissions', {
   id: uuid('id').defaultRandom().primaryKey(),
   studentId: uuid('student_id')
@@ -33,7 +37,6 @@ export const submissions = pgTable('submissions', {
   gradedAt: timestamp('graded_at'),
 });
 
-// Relations with proper imports
 export const submissionsRelations = relations(submissions, ({ one }) => ({
   student: one(users, {
     fields: [submissions.studentId],
@@ -49,6 +52,5 @@ export const submissionsRelations = relations(submissions, ({ one }) => ({
   }),
 }));
 
-// Types
 export type Submission = typeof submissions.$inferSelect;
 export type NewSubmission = typeof submissions.$inferInsert;

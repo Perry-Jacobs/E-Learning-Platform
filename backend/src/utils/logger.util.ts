@@ -5,7 +5,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Define log levels
+/**
+ * Log level definitions in order of priority
+ * Higher number = more verbose logging
+ */
 const levels = {
   error: 0,
   warn: 1,
@@ -14,7 +17,9 @@ const levels = {
   debug: 4,
 };
 
-// Define log colors
+/**
+ * Color mapping for console output
+ */
 const colors = {
   error: 'red',
   warn: 'yellow',
@@ -25,8 +30,10 @@ const colors = {
 
 winston.addColors(colors);
 
-// Define log format
-const logFormat = winston.format.combine(
+/**
+ * Console log format with timestamps and colors
+ */
+const consoleFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
@@ -34,12 +41,17 @@ const logFormat = winston.format.combine(
   )
 );
 
+/**
+ * JSON file format for structured logging
+ */
 const fileFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.json()
 );
 
-// Create logs directory if it doesn't exist
+/**
+ * Ensure logs directory exists
+ */
 const logsDir = path.join(process.cwd(), 'logs');
 try {
   if (!fs.existsSync(logsDir)) {
@@ -49,33 +61,32 @@ try {
   console.error('Could not create logs directory:', error);
 }
 
-// Create logger instance
+/**
+ * Main logger instance configured for console output
+ * File output is added in production environment
+ */
 export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'development' ? 'debug' : 'info'),
   levels,
-  format: logFormat,
+  format: consoleFormat,
   transports: [
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-        winston.format.colorize({ all: true }),
-        winston.format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      ),
+      format: consoleFormat,
     }),
   ],
   exitOnError: false,
 });
 
-// Add file transports in production
+/**
+ * Add file transports in production or when logging is explicitly enabled
+ */
 if (process.env.NODE_ENV === 'production' || process.env.ENABLE_LOGGING === 'true') {
   logger.add(
     new winston.transports.File({
       filename: path.join(logsDir, 'error.log'),
       level: 'error',
       format: fileFormat,
-      maxsize: 5242880,
+      maxsize: 5242880, // 5MB
       maxFiles: 5,
     })
   );
@@ -84,13 +95,15 @@ if (process.env.NODE_ENV === 'production' || process.env.ENABLE_LOGGING === 'tru
     new winston.transports.File({
       filename: path.join(logsDir, 'combined.log'),
       format: fileFormat,
-      maxsize: 5242880,
+      maxsize: 5242880, // 5MB
       maxFiles: 5,
     })
   );
 }
 
-// Export helper functions
+/**
+ * Convenience logging functions with typed parameters
+ */
 export const log = {
   error: (message: string, meta?: any) => logger.error(message, meta),
   warn: (message: string, meta?: any) => logger.warn(message, meta),
@@ -99,7 +112,9 @@ export const log = {
   debug: (message: string, meta?: any) => logger.debug(message, meta),
 };
 
-// Stream for Morgan integration
+/**
+ * Stream for Morgan HTTP request logging integration
+ */
 export const stream = {
   write: (message: string) => {
     logger.http(message.trim());

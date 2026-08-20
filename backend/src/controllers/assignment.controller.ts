@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
+/**
+ * Get all assignments with optional course filter
+ */
 export const getAllAssignments = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.query;
@@ -16,11 +19,15 @@ export const getAllAssignments = async (req: Request, res: Response): Promise<vo
     const result = await db.execute(query);
     res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
-    console.error('Error fetching assignments:', error);
+    const err = error as Error;
+    console.error('Error fetching assignments:', err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch assignments' });
   }
 };
 
+/**
+ * Get a single assignment by ID with course details
+ */
 export const getAssignmentById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -41,11 +48,15 @@ export const getAssignmentById = async (req: Request, res: Response): Promise<vo
 
     res.status(200).json({ success: true, data: assignmentResult.rows[0] });
   } catch (error) {
-    console.error('Error fetching assignment:', error);
+    const err = error as Error;
+    console.error('Error fetching assignment:', err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch assignment' });
   }
 };
 
+/**
+ * Create a new assignment (lecturer/admin only)
+ */
 export const createAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, course_id, due_date, max_score } = req.body;
@@ -84,11 +95,15 @@ export const createAssignment = async (req: Request, res: Response): Promise<voi
       data: result.rows[0],
     });
   } catch (error) {
-    console.error('Error creating assignment:', error);
+    const err = error as Error;
+    console.error('Error creating assignment:', err.message);
     res.status(500).json({ success: false, message: 'Failed to create assignment' });
   }
 };
 
+/**
+ * Update an existing assignment (lecturer/admin only)
+ */
 export const updateAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -131,11 +146,15 @@ export const updateAssignment = async (req: Request, res: Response): Promise<voi
       data: result.rows[0],
     });
   } catch (error) {
-    console.error('Error updating assignment:', error);
+    const err = error as Error;
+    console.error('Error updating assignment:', err.message);
     res.status(500).json({ success: false, message: 'Failed to update assignment' });
   }
 };
 
+/**
+ * Delete an assignment (lecturer/admin only)
+ */
 export const deleteAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -167,11 +186,15 @@ export const deleteAssignment = async (req: Request, res: Response): Promise<voi
       message: 'Assignment deleted successfully',
     });
   } catch (error) {
-    console.error('Error deleting assignment:', error);
+    const err = error as Error;
+    console.error('Error deleting assignment:', err.message);
     res.status(500).json({ success: false, message: 'Failed to delete assignment' });
   }
 };
 
+/**
+ * Submit an assignment (student only)
+ */
 export const submitAssignment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { assignment_id, submission_text, file_url } = req.body;
@@ -228,7 +251,8 @@ export const submitAssignment = async (req: Request, res: Response): Promise<voi
       data: result.rows[0],
     });
   } catch (error) {
-    console.error('Error submitting assignment:', error);
+    const err = error as Error;
+    console.error('Error submitting assignment:', err.message);
     res.status(500).json({ success: false, message: 'Failed to submit assignment' });
   }
 };

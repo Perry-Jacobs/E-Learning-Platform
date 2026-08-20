@@ -1,15 +1,39 @@
 import { sql, SQL } from 'drizzle-orm';
 import { db } from '../config/database.config';
 
+/** Course filters for listing courses */
+interface CourseFilters {
+  category?: string;
+  level?: string;
+  status?: string;
+  instructorId?: string;
+}
+
+/** Course data for creation */
+interface CourseCreateData {
+  title: string;
+  description?: string;
+  category?: string;
+  level?: string;
+  price?: number;
+  thumbnail_url?: string;
+}
+
+/** Course data for update */
+interface CourseUpdateData extends Partial<CourseCreateData> {
+  status?: string;
+}
+
+/** Course service for CRUD operations */
 export const CourseService = {
-  getAll: async (filters: {
-    category?: string;
-    level?: string;
-    status?: string;
-    instructorId?: string;
-  }) => {
+  /**
+   * Retrieves all courses with optional filters
+   * @param {CourseFilters} filters - Filters for course listing
+   * @returns {Promise<Array>} List of courses with instructor names
+   */
+  getAll: async (filters: CourseFilters) => {
     let query = sql`
-      SELECT c.*, u.name as instructor_name 
+      SELECT c.*, u.full_name as instructor_name 
       FROM courses c
       LEFT JOIN users u ON c.instructor_id = u.id
     `;
@@ -30,10 +54,16 @@ export const CourseService = {
     return result.rows;
   },
 
+  /**
+   * Retrieves a single course by ID
+   * @param {string} id - Course ID
+   * @returns {Promise<Object>} Course with instructor details
+   * @throws {Error} If course is not found
+   */
   getById: async (id: string) => {
     const result = await db.execute(
       sql`
-        SELECT c.*, u.name as instructor_name 
+        SELECT c.*, u.full_name as instructor_name 
         FROM courses c
         LEFT JOIN users u ON c.instructor_id = u.id
         WHERE c.id = ${id}
@@ -47,7 +77,13 @@ export const CourseService = {
     return result.rows[0];
   },
 
-  create: async (data: any, instructorId: string) => {
+  /**
+   * Creates a new course
+   * @param {CourseCreateData} data - Course creation data
+   * @param {string} instructorId - ID of the instructor creating the course
+   * @returns {Promise<Object>} Created course
+   */
+  create: async (data: CourseCreateData, instructorId: string) => {
     const { title, description, category, level, price, thumbnail_url } = data;
 
     const result = await db.execute(
@@ -61,7 +97,16 @@ export const CourseService = {
     return result.rows[0];
   },
 
-  update: async (id: string, data: any, instructorId: string, userRole?: string) => {
+  /**
+   * Updates an existing course
+   * @param {string} id - Course ID to update
+   * @param {CourseUpdateData} data - Course update data
+   * @param {string} instructorId - ID of the instructor making the update
+   * @param {string} [userRole] - Role of the user making the request
+   * @returns {Promise<Object>} Updated course
+   * @throws {Error} If course not found or user lacks permission
+   */
+  update: async (id: string, data: CourseUpdateData, instructorId: string, userRole?: string) => {
     const check = await db.execute(
       sql`SELECT instructor_id FROM courses WHERE id = ${id}`
     );
@@ -70,6 +115,7 @@ export const CourseService = {
       throw new Error('Course not found');
     }
 
+    // Verify instructor owns the course or user is admin
     if (check.rows[0].instructor_id !== instructorId && userRole !== 'admin') {
       throw new Error('You are not the instructor of this course');
     }
@@ -90,6 +136,14 @@ export const CourseService = {
     return result.rows[0];
   },
 
+  /**
+   * Deletes a course
+   * @param {string} id - Course ID to delete
+   * @param {string} instructorId - ID of the instructor making the request
+   * @param {string} [userRole] - Role of the user making the request
+   * @returns {Promise<Object>} Deletion confirmation
+   * @throws {Error} If course not found or user lacks permission
+   */
   delete: async (id: string, instructorId: string, userRole?: string) => {
     const check = await db.execute(
       sql`SELECT instructor_id FROM courses WHERE id = ${id}`
@@ -99,6 +153,7 @@ export const CourseService = {
       throw new Error('Course not found');
     }
 
+    // Verify instructor owns the course or user is admin
     if (check.rows[0].instructor_id !== instructorId && userRole !== 'admin') {
       throw new Error('You are not the instructor of this course');
     }
@@ -107,6 +162,13 @@ export const CourseService = {
     return { success: true };
   },
 
+  /**
+   * Enrolls a student in a course
+   * @param {string} courseId - ID of the course to enroll in
+   * @param {string} studentId - ID of the student enrolling
+   * @returns {Promise<Object>} Enrollment confirmation
+   * @throws {Error} If course not found or student already enrolled
+   */
   enroll: async (courseId: string, studentId: string) => {
     const courseCheck = await db.execute(
       sql`SELECT id FROM courses WHERE id = ${courseId}`
@@ -116,6 +178,7 @@ export const CourseService = {
       throw new Error('Course not found');
     }
 
+    // Check if already enrolled
     const check = await db.execute(
       sql`SELECT id FROM enrollments WHERE student_id = ${studentId} AND course_id = ${courseId}`
     );
@@ -134,6 +197,11 @@ export const CourseService = {
     return { success: true };
   },
 
+  /**
+   * Retrieves courses the student is enrolled in
+   * @param {string} studentId - ID of the student
+   * @returns {Promise<Array>} List of enrolled courses with enrollment details
+   */
   getMyCourses: async (studentId: string) => {
     const result = await db.execute(
       sql`

@@ -11,6 +11,10 @@ import {
 import { relations } from 'drizzle-orm';
 import { courses } from './courses.schema';
 
+/**
+ * Chapters table schema
+ * Represents course chapters/sections with video content
+ */
 export const chapters = pgTable('chapters', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
@@ -29,7 +33,6 @@ export const chapters = pgTable('chapters', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Relations with proper imports
 export const chaptersRelations = relations(chapters, ({ one }) => ({
   course: one(courses, {
     fields: [chapters.courseId],
@@ -37,6 +40,5 @@ export const chaptersRelations = relations(chapters, ({ one }) => ({
   }),
 }));
 
-// Types
 export type Chapter = typeof chapters.$inferSelect;
 export type NewChapter = typeof chapters.$inferInsert;

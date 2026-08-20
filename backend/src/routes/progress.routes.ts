@@ -9,8 +9,14 @@ import { authenticate } from '../middleware';
 
 const router = Router();
 
+/**
+ * All progress routes require authentication
+ */
 router.use(authenticate);
 
+/**
+ * Progress tracking routes
+ */
 router.get('/user/:userId', getUserProgress);
 router.get('/course/:userId/:courseId', getCourseProgress);
 router.post('/', updateProgress);

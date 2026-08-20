@@ -13,6 +13,10 @@ import { users } from './users.schema';
 import { courses } from './courses.schema';
 import { chapters } from './chapters.schema';
 
+/**
+ * Progress table schema
+ * Tracks student progress through courses
+ */
 export const progress = pgTable('progress', {
   id: uuid('id').defaultRandom().primaryKey(),
   studentId: uuid('student_id')
@@ -36,7 +40,6 @@ export const progress = pgTable('progress', {
   completedAt: timestamp('completed_at'),
 });
 
-// Relations with proper imports
 export const progressRelations = relations(progress, ({ one }) => ({
   student: one(users, {
     fields: [progress.studentId],
@@ -52,6 +55,5 @@ export const progressRelations = relations(progress, ({ one }) => ({
   }),
 }));
 
-// Types
 export type Progress = typeof progress.$inferSelect;
 export type NewProgress = typeof progress.$inferInsert;

@@ -13,9 +13,14 @@ import { progress } from './progress.schema';
 import { threads } from './discussions.schema';
 import { submissions } from './submissions.schema';
 
-// Enum for user roles
+/**
+ * User role enum
+ */
 export const userRoleEnum = pgEnum('user_role', ['student', 'lecturer', 'admin']);
 
+/**
+ * Users table schema
+ */
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   fullName: varchar('full_name', { length: 255 }).notNull(),
@@ -31,7 +36,9 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Relations with proper imports
+/**
+ * Users table relations
+ */
 export const usersRelations = relations(users, ({ many }) => ({
   courses: many(courses),
   progress: many(progress),
@@ -39,6 +46,5 @@ export const usersRelations = relations(users, ({ many }) => ({
   submissions: many(submissions),
 }));
 
-// Types
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;

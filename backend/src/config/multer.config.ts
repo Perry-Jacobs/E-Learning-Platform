@@ -1,12 +1,16 @@
 import multer from 'multer';
 import { constants } from './constants';
 
-// Configure storage (memory storage for Cloudinary)
+/**
+ * Configure storage (memory storage for Cloudinary)
+ */
 const storage = multer.memoryStorage();
 
-// File filter function
+/**
+ * File filter function for general uploads
+ */
 const fileFilter = (
-  _req: any,  // ✅ Prefix with underscore = intentionally unused
+  _req: any,
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
@@ -31,9 +35,10 @@ const fileFilter = (
   }
 };
 
-// Multer configuration for different use cases
+/**
+ * Multer configuration for different use cases
+ */
 export const multerConfig = {
-  // General upload (any file type)
   general: multer({
     storage,
     fileFilter,
@@ -42,10 +47,9 @@ export const multerConfig = {
     },
   }),
 
-  // Image upload only
   image: multer({
     storage,
-    fileFilter: (_req, file, cb) => {  // ✅ _req here too
+    fileFilter: (_req, file, cb) => {
       if (constants.fileTypes.IMAGE.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -57,10 +61,9 @@ export const multerConfig = {
     },
   }),
 
-  // Video upload only
   video: multer({
     storage,
-    fileFilter: (_req, file, cb) => {  // ✅ _req here too
+    fileFilter: (_req, file, cb) => {
       if (constants.fileTypes.VIDEO.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -72,10 +75,9 @@ export const multerConfig = {
     },
   }),
 
-  // Document upload only
   document: multer({
     storage,
-    fileFilter: (_req, file, cb) => {  // ✅ _req here too
+    fileFilter: (_req, file, cb) => {
       if (constants.fileTypes.DOCUMENT.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -87,10 +89,9 @@ export const multerConfig = {
     },
   }),
 
-  // Profile picture upload
   profile: multer({
     storage,
-    fileFilter: (_req, file, cb) => {  // ✅ _req here too
+    fileFilter: (_req, file, cb) => {
       if (constants.fileTypes.IMAGE.includes(file.mimetype)) {
         cb(null, true);
       } else {
@@ -103,7 +104,9 @@ export const multerConfig = {
   }),
 };
 
-// Create multer instances for different use cases
+/**
+ * Upload middleware factories
+ */
 export const upload = {
   single: (fieldName: string) => multerConfig.general.single(fieldName),
   array: (fieldName: string, maxCount: number) => 
@@ -111,7 +114,6 @@ export const upload = {
   fields: (fields: { name: string; maxCount: number }[]) => 
     multerConfig.general.fields(fields),
   none: () => multerConfig.general.none(),
-  // Specific upload types
   image: {
     single: (fieldName: string) => multerConfig.image.single(fieldName),
     array: (fieldName: string, maxCount: number) => 

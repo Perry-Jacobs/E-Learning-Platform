@@ -17,6 +17,10 @@ import { quizzes } from './quizzes.schema';
 import { progress } from './progress.schema';
 import { threads } from './discussions.schema';
 
+/**
+ * Courses table schema
+ * Main course entity with instructor, pricing, and metadata
+ */
 export const courses = pgTable('courses', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
@@ -40,7 +44,6 @@ export const courses = pgTable('courses', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Relations with proper imports
 export const coursesRelations = relations(courses, ({ one, many }) => ({
   instructor: one(users, {
     fields: [courses.instructorId],
@@ -53,6 +56,5 @@ export const coursesRelations = relations(courses, ({ one, many }) => ({
   threads: many(threads),
 }));
 
-// Types
 export type Course = typeof courses.$inferSelect;
 export type NewCourse = typeof courses.$inferInsert;
